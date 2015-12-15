@@ -13,16 +13,54 @@ import org.hibernate.Transaction;
 import domain.RateDomainModel;
 import util.HibernateUtil;
 
+import org.apache.poi.ss.formula.functions.FinanceLib;
+
 public class RateDAL {
 
-
-	public static double getRate(int GivenCreditScore) {
-		//FinalExam - please implement		
-		// Figure out which row makes sense- return back the 
-		// right interest rate from the table based on the given credit score
+	
+	public static ArrayList<RateDomainModel> getAllRates() {
 		
-		//FinalExam - obviously change the return value
-		return 0;
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		Transaction tx = null;
+		//RateDomainModel ratGet = null;	Possibly unnecessary
+		ArrayList<RateDomainModel> rats = new ArrayList<RateDomainModel>();
+		
+		try {
+			tx = session.beginTransaction();	 
+			
+			List rates = session.createQuery("FROM RateDomainModel").list();
+			for (Iterator iterator = rates.iterator(); iterator.hasNext();) {
+				RateDomainModel rat = (RateDomainModel) iterator.next();
+				rats.add(rat);
+
+			}
+			tx.commit();
+		} catch (HibernateException e) {
+			if (tx != null)
+				tx.rollback();
+			e.printStackTrace();
+		} finally {
+			session.close();
+		}
+		return rats;
+	}
+	
+	public static double getRate(int GivenCreditScore) {
+		//Return the lowest possible interest rate for the credit score
+		
+		//Get the rates from the table
+		ArrayList<RateDomainModel> rates = RateDAL.getAllRates();
+		
+		double bestRate = 0;
+		for (RateDomainModel rr : rates) {
+			if (GivenCreditScore > rr.getMinCreditScore()) { 
+				bestRate = rr.getInterestRate();
+			}
+			else { continue; }
+		}
+		
+		//if bestRate still = 0 at this point, a loan was not qualified for
+		return bestRate;
 	}
 
 }
