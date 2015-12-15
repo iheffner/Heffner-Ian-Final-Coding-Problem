@@ -102,7 +102,7 @@ public class MortgageController {
 			lblMortgagePayment.setText("House cost too high.");
 		}
 		//Second condition of approval
-		else if (payment > ((monthlyIncome - monthlyExpenses) * .18) ) {
+		else if (payment > ((monthlyIncome - monthlyExpenses) * .28) ) {
 			approvedLoan = false;
 			lblMortgagePayment.setText("House cost too high.");
 		}
